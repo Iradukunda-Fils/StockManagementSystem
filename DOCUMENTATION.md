@@ -12,13 +12,13 @@
 
 | Field | Details |
 | :--- | :--- |
-| **Student ID** | `[INSERT YOUR STUDENT ID, e.g., 23000]` |
-| **Full Name** | `[INSERT YOUR FIRST NAME AND LAST NAME]` |
+| **Student ID** | `29853` |
+| **Full Name** | `Iradukunda Fils` |
 | **Class / Group** | `Group B / INN-3` |
 | **Public GitHub Repository** | https://github.com/Iradukunda-Fils/StockManagementSystem |
 | **Video Demonstration Link (Google Vids)** | `[INSERT YOUR GOOGLE VIDS / DRIVE SHAREABLE LINK]` |
 | **UI/UX & Figma Specification Guide** | [UI_UX_DESIGN_SPECIFICATION.md](file:///home/iradukunda/Lost/Learn/Auca-Innovation/JAVA/WebTeck/StockManagementSystem/UI_UX_DESIGN_SPECIFICATION.md) |
-| **Submission Archive Name** | `23000_first_name_last_name_assigment_3.zip` |
+| **Submission Archive Name** | `29853_iradukunda_fils_assigment_3.zip` |
 
 ---
 
@@ -299,7 +299,54 @@ The transactional engine recording inventory audit logs for every stock mutation
 
 ---
 
-## 9. Video Recording Guide (5–10 Minutes via Google Vids)
+## 9. Docker Containerization & Orchestration Guide
+
+The project is fully containerized according to industry-standard architectural best practices for enterprise readiness.
+
+### Architecture Overview
+- **Multi-Stage Dockerfile**:
+  - **Stage 1 (Builder)**: Uses `eclipse-temurin:21-jdk-jammy` to compile source code and package the Spring Boot executable JAR.
+  - **Stage 2 (Runtime)**: Uses `eclipse-temurin:21-jre-jammy` (minimal JRE attack surface).
+  - **Security**: Runs under an unprivileged, non-root system user (`spring:spring`).
+  - **JVM Optimization**: Configured with `-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0` to respect container memory limits and prevent OOM kills.
+  - **Healthcheck**: Periodically polls `/api/v1/products` to verify container readiness.
+- **Multi-Container Orchestration (`docker-compose.yml`)**:
+  - `postgres-db`: Official PostgreSQL 16 Alpine image with persistent volume `postgres_data` and healthcheck via `pg_isready`.
+  - `stock-app`: Spring Boot container configured to wait until `postgres-db` is healthy (`condition: service_healthy`) before booting.
+
+### Docker Commands
+
+#### 1. Start Full Application Stack (App + Database)
+```bash
+docker compose up -d --build
+```
+
+#### 2. Check Container Health & Status
+```bash
+docker compose ps
+```
+
+#### 3. View Real-Time Logs
+```bash
+# View all logs
+docker compose logs -f
+
+# View Spring Boot application logs only
+docker compose logs -f stock-app
+```
+
+#### 4. Stop and Tear Down Containers
+```bash
+# Stop containers while preserving database volume
+docker compose down
+
+# Stop containers and remove volumes (clean reset)
+docker compose down -v
+```
+
+---
+
+## 10. Video Recording Guide (5–10 Minutes via Google Vids)
 
 As required by Assignment-4 (Requirement 4), record a 5–10 minute presentation using Google Vids (or screen recorder with webcam enabled).
 
@@ -307,40 +354,39 @@ As required by Assignment-4 (Requirement 4), record a 5–10 minute presentation
 
 | Time | Agenda Item | Demonstration Content |
 | :--- | :--- | :--- |
-| **0:00 – 1:00** | **Introduction** | State your name, student ID, course, and project title (*"Stock Management System"*). |
+| **0:00 – 1:00** | **Introduction** | State your name (`Iradukunda Fils`), student ID (`29853`), course, and project title (*"Stock Management System"*). |
 | **1:00 – 2:30** | **Architectural Design** | Show your project structure in your IDE. Explain the N-Tier Layered Architecture (`Controller -> Service -> Repository -> Entity`), DTO records, and Global Exception Handler. |
 | **2:30 – 4:30** | **Entity 1: Warehouse CRUD** | Open Postman: Execute `POST /api/v1/warehouses`, demonstrate input validation rejection (negative capacity), duplicate code check, and `GET /api/v1/warehouses`. |
 | **4:30 – 6:30** | **Entity 2: Product CRUD** | Demonstrate `POST /api/v1/products`, show warehouse linkage, low-stock threshold alert calculation, and prevention of product deletion when stock > 0. |
-| **6:30 – 8:30** | **Entity 3: Stock Movement Engine** | Demonstrate `STOCK_IN` (product stock increases), `STOCK_OUT` (product stock decreases), show business logic validation blocking excessive `STOCK_OUT` (insufficient stock), and warehouse capacity limits. |
-| **8:30 – 9:30** | **Automated Tests** | Run `./mvnw test` in your terminal to demonstrate all 17 automated unit and integration tests passing (`BUILD SUCCESS`). |
-| **9:30 – 10:00** | **Conclusion** | Mention your public GitHub repository and conclude the presentation. |
+| **6:30 – 8:00** | **Entity 3: Stock Movement Engine** | Demonstrate `STOCK_IN` (product stock increases), `STOCK_OUT` (product stock decreases), show business logic validation blocking excessive `STOCK_OUT` (insufficient stock), and warehouse capacity limits. |
+| **8:00 – 9:00** | **Docker & Production Hardening** | Show `docker-compose.yml`, run `docker compose ps` or show container healthchecks, and mention optimistic locking (`@Version`) + JPA Auditing. |
+| **9:00 – 9:30** | **Automated Tests** | Run `./mvnw test` in your terminal to demonstrate all automated unit and integration tests passing (`BUILD SUCCESS`). |
+| **9:30 – 10:00** | **Conclusion** | Mention your public GitHub repository (`https://github.com/Iradukunda-Fils/StockManagementSystem`) and conclude the presentation. |
 
 ---
 
-## 10. Packaging & Submission Instructions
+## 11. Packaging & Submission Instructions
 
 Follow these exact steps to prepare your submission archive before the deadline:
 
-1. **Update Placeholders**:
-   - In this `DOCUMENTATION.md` file, replace `[INSERT YOUR STUDENT ID]` with your actual AUCA Student ID.
-   - Insert your Name, Public GitHub URL, and Google Vids video link.
-
-2. **Commit & Push to GitHub**:
+1. **Commit & Push to GitHub**:
    ```bash
    git add .
-   git commit -m "Complete Assignment 4 Stock Management System implementation"
-   git remote add origin <YOUR_GITHUB_REPOSITORY_URL>
-   git push -u origin master
+   git commit -m "feat: complete enterprise stock management system with docker containerization"
+   git push -u origin main
    ```
 
-3. **Package the Project Zip**:
-   Format: `23000_first_name_last_name_assigment_3.zip` (replacing with your details):
+2. **Package the Project Zip**:
+   Format: `29853_iradukunda_fils_assigment_3.zip`:
    ```bash
-   zip -r 23000_first_name_last_name_assigment_3.zip . -x "target/*" ".git/*" ".idea/*"
+   zip -r 29853_iradukunda_fils_assigment_3.zip . -x "target/*" ".git/*" ".idea/*"
    ```
 
-4. **Verify Contents of Zip**:
+3. **Verify Contents of Zip**:
    Ensure the zip file contains:
    - Complete Spring Boot source code (`src/`, `pom.xml`, `mvnw`)
+   - `Dockerfile`, `docker-compose.yml`, `.dockerignore`
    - `DOCUMENTATION.md` (with GitHub link and Video link)
+   - `UI_UX_DESIGN_SPECIFICATION.md` (Figma & UI specification)
    - `StockManagementSystem.postman_collection.json`
+
