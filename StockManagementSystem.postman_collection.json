@@ -1,0 +1,681 @@
+{
+  "info": {
+    "_postman_id": "9a1e8c04-582b-4fa7-8db1-95b7194c7b6a",
+    "name": "Stock Management System API Collection",
+    "description": "Comprehensive REST API collection for Stock Management System (Spring Boot 4, Java 21) covering CRUD operations and business logic validation across Warehouse, Product, and StockMovement entities.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "warehouseId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "movementId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Warehouses",
+      "item": [
+        {
+          "name": "Create Warehouse (Success)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.id) {",
+                  "    pm.collectionVariables.set(\"warehouseId\", jsonData.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"warehouseCode\": \"WH-KGL-01\",\n  \"warehouseName\": \"Kigali Central Distribution Hub\",\n  \"location\": \"Kigali Special Economic Zone, Masoro\",\n  \"capacity\": 1000,\n  \"contactEmail\": \"kigali.hub@inventory.rw\",\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/warehouses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "warehouses"]
+            }
+          }
+        },
+        {
+          "name": "Create Warehouse - Validation Failure (Negative Capacity)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"warehouseCode\": \"WH-ERR-01\",\n  \"warehouseName\": \"Invalid Warehouse\",\n  \"location\": \"Downtown\",\n  \"capacity\": -50,\n  \"contactEmail\": \"bad-email\",\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/warehouses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "warehouses"]
+            }
+          }
+        },
+        {
+          "name": "Create Warehouse - Duplicate Code (Conflict)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 409 Conflict\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"warehouseCode\": \"WH-KGL-01\",\n  \"warehouseName\": \"Duplicate Warehouse\",\n  \"location\": \"Kigali\",\n  \"capacity\": 500,\n  \"contactEmail\": \"dup@inventory.rw\",\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/warehouses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "warehouses"]
+            }
+          }
+        },
+        {
+          "name": "Get All Warehouses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/warehouses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "warehouses"]
+            }
+          }
+        },
+        {
+          "name": "Get Warehouse by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/warehouses/{{warehouseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "warehouses", "{{warehouseId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Warehouse by Code",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/warehouses/code/WH-KGL-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "warehouses", "code", "WH-KGL-01"]
+            }
+          }
+        },
+        {
+          "name": "Update Warehouse",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"warehouseCode\": \"WH-KGL-01\",\n  \"warehouseName\": \"Kigali Regional Logistics Mega-Hub\",\n  \"location\": \"Prime Economic Zone, Masoro\",\n  \"capacity\": 1200,\n  \"contactEmail\": \"kigali.operations@inventory.rw\",\n  \"active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/warehouses/{{warehouseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "warehouses", "{{warehouseId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Warehouse",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/warehouses/{{warehouseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "warehouses", "{{warehouseId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Products",
+      "item": [
+        {
+          "name": "Register Product (Success)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.id) {",
+                  "    pm.collectionVariables.set(\"productId\", jsonData.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"PRD-LAP-001\",\n  \"productName\": \"Lenovo ThinkPad P16s\",\n  \"description\": \"Enterprise mobile workstation 32GB RAM 1TB SSD\",\n  \"price\": 1850.00,\n  \"quantityInStock\": 50,\n  \"reorderLevel\": 15,\n  \"warehouseId\": \"{{warehouseId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products"]
+            }
+          }
+        },
+        {
+          "name": "Register Product - Validation Failure (Negative Price)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"PRD-BAD-001\",\n  \"productName\": \"Invalid Item\",\n  \"description\": \"Wrong price product\",\n  \"price\": -20.00,\n  \"quantityInStock\": 10,\n  \"reorderLevel\": 5,\n  \"warehouseId\": \"{{warehouseId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products"]
+            }
+          }
+        },
+        {
+          "name": "Register Product - Exceeds Warehouse Capacity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"PRD-BULK-999\",\n  \"productName\": \"Massive Cargo Batch\",\n  \"description\": \"Cargo exceeding warehouse capacity\",\n  \"price\": 150.00,\n  \"quantityInStock\": 5000,\n  \"reorderLevel\": 100,\n  \"warehouseId\": \"{{warehouseId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products"]
+            }
+          }
+        },
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products"]
+            }
+          }
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products", "{{productId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Product by SKU",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products/sku/PRD-LAP-001",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products", "sku", "PRD-LAP-001"]
+            }
+          }
+        },
+        {
+          "name": "Get Low Stock Alert Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products/low-stock",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products", "low-stock"]
+            }
+          }
+        },
+        {
+          "name": "Get Products by Warehouse",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products/warehouse/{{warehouseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products", "warehouse", "{{warehouseId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"PRD-LAP-001\",\n  \"productName\": \"Lenovo ThinkPad P16s Gen 2\",\n  \"description\": \"Upgraded specs: 64GB RAM 2TB SSD\",\n  \"price\": 1950.00,\n  \"quantityInStock\": 50,\n  \"reorderLevel\": 20,\n  \"warehouseId\": \"{{warehouseId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products", "{{productId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Product - Business Validation (Prevent Delete with Active Stock)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "products", "{{productId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Stock Movements",
+      "item": [
+        {
+          "name": "Record STOCK_IN (Valid Restock)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.id) {",
+                  "    pm.collectionVariables.set(\"movementId\", jsonData.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"movementType\": \"STOCK_IN\",\n  \"quantity\": 25,\n  \"productId\": \"{{productId}}\",\n  \"notes\": \"Received new container delivery from manufacturer\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/stock-movements",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "stock-movements"]
+            }
+          }
+        },
+        {
+          "name": "Record STOCK_OUT (Valid Fulfillment)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"movementType\": \"STOCK_OUT\",\n  \"quantity\": 15,\n  \"productId\": \"{{productId}}\",\n  \"notes\": \"Customer sales order #SO-9812 dispatched\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/stock-movements",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "stock-movements"]
+            }
+          }
+        },
+        {
+          "name": "Record STOCK_OUT - Business Validation (Insufficient Stock Deficit)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"movementType\": \"STOCK_OUT\",\n  \"quantity\": 500,\n  \"productId\": \"{{productId}}\",\n  \"notes\": \"Attempt to withdraw more items than exist in stock\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/stock-movements",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "stock-movements"]
+            }
+          }
+        },
+        {
+          "name": "Record ADJUSTMENT - Business Validation (Missing Mandatory Notes)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400 Bad Request\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"movementType\": \"ADJUSTMENT\",\n  \"quantity\": 58,\n  \"productId\": \"{{productId}}\",\n  \"notes\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/stock-movements",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "stock-movements"]
+            }
+          }
+        },
+        {
+          "name": "Record ADJUSTMENT (Valid Physical Audit Count)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 Created\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"movementType\": \"ADJUSTMENT\",\n  \"quantity\": 60,\n  \"productId\": \"{{productId}}\",\n  \"notes\": \"Quarterly physical inventory recount audit adjustment\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/stock-movements",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "stock-movements"]
+            }
+          }
+        },
+        {
+          "name": "Get All Stock Movements",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/stock-movements",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "stock-movements"]
+            }
+          }
+        },
+        {
+          "name": "Get Movement by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/stock-movements/{{movementId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "stock-movements", "{{movementId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Movements by Product",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/stock-movements/product/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "stock-movements", "product", "{{productId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Movements by Warehouse",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/stock-movements/warehouse/{{warehouseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "stock-movements", "warehouse", "{{warehouseId}}"]
+            }
+          }
+        },
+        {
+          "name": "Reverse / Delete Stock Movement",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 204 No Content\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/stock-movements/{{movementId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "stock-movements", "{{movementId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
