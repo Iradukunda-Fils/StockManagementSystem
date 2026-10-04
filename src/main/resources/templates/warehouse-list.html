@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Directory — Stock Management System</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #0f172a; margin: 0; padding: 2rem; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: 1px solid #e2e8f0; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        h1 { margin: 0; font-size: 1.5rem; color: #1e3a8a; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; }
+        th { background: #f1f5f9; color: #64748b; font-weight: 600; }
+        .btn { background: #1e3a8a; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; font-size: 0.85rem; }
+        .btn-danger { background: #dc2626; }
+        .btn-sm { padding: 0.35rem 0.7rem; font-size: 0.8rem; }
+        .actions { display: flex; gap: 0.5rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Warehouse Directory</h1>
+        <div>
+            <a th:href="@{/warehouse/registration-page}" class="btn">+ Register Warehouse</a>
+            <a th:href="@{/}" class="btn" style="background: #64748b; margin-left: 0.5rem;">Home Dashboard</a>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Capacity</th>
+                <th>Contact</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:if="${#lists.isEmpty(warehouses)}">
+                <td colspan="6" style="text-align: center; color: #64748b;">No warehouses found. Click "Register Warehouse" above to add one.</td>
+            </tr>
+            <tr th:each="w : ${warehouses}">
+                <td><strong th:text="${w.warehouseCode}"></strong></td>
+                <td th:text="${w.warehouseName}"></td>
+                <td th:text="${w.location}"></td>
+                <td th:text="${#numbers.formatInteger(w.capacity, 0, 'COMMA')} + ' units'"></td>
+                <td th:text="${w.contactEmail != null ? w.contactEmail : '—'}"></td>
+                <td class="actions">
+                    <form th:action="@{/warehouse/update-page}" method="post" style="display:inline;">
+                        <input type="hidden" name="id" th:value="${w.id}"/>
+                        <button type="submit" class="btn btn-sm">Edit</button>
+                    </form>
+                    <form th:action="@{/warehouse/delete}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this warehouse?');">
+                        <input type="hidden" name="id" th:value="${w.id}"/>
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
