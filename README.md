@@ -231,6 +231,33 @@ A fully automated Postman collection is included in the root directory:
 
 ---
 
+## 🎨 User Interfaces & Frontend Applications
+
+The Stock Management System provides **two production-ready frontend experiences** tailored for enterprise operators:
+
+### Option A: Embedded Zero-Dependency Web Portal (Built-in)
+- **URL**: `http://localhost:8080/`
+- **Setup**: Included directly in the Spring Boot JAR / Docker container. No Node.js or npm required!
+- **Features**:
+  - Live inventory dashboard with real-time KPI metrics.
+  - Interactive warehouse capacity progress indicators.
+  - Deficit-guarded stock movement modal with real-time balance calculations.
+  - Low-stock alert command center with one-click restock pre-fill.
+  - Zero-stock deletion protection feedback.
+
+### Option B: Modern Standalone React Application (Figma-Engineered)
+- **Directory**: [`frontend/`](file:///home/iradukunda/Lost/Learn/Auca-Innovation/JAVA/WebTeck/StockManagementSystem/frontend)
+- **Stack**: React 19, TypeScript, Vite 8, Tailwind CSS v4, Lucide Icons.
+- **Running the React Frontend**:
+  ```bash
+  cd frontend
+  npm install
+  npm run dev
+  ```
+  The application opens at `http://localhost:5173/` and proxies all `/api` calls directly to `http://localhost:8080/api`.
+
+---
+
 ## 🎨 UI/UX & Figma Specification
 
 For frontend developers and UI/UX designers building client interfaces (web, mobile, or Figma):

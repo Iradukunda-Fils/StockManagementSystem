@@ -3,804 +3,1549 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Management System — Enterprise Portal</title>
+    <title>StockCore Enterprise — Stock Management System</title>
     <style>
         :root {
-            --primary: #1e3a8a;
+            --primary: #1e40af;
             --primary-hover: #1d4ed8;
-            --primary-light: #eff6ff;
-            --secondary: #0f172a;
+            --primary-50: #eff6ff;
+            --primary-100: #dbeafe;
             --success: #16a34a;
-            --success-light: #f0fdf4;
+            --success-50: #f0fdf4;
             --warning: #d97706;
-            --warning-light: #fffbeb;
+            --warning-50: #fffbeb;
             --danger: #dc2626;
-            --danger-light: #fef2f2;
+            --danger-50: #fef2f2;
+            --info: #2563eb;
+            --info-50: #eff6ff;
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-400: #94a3b8;
+            --slate-300: #cbd5e1;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
             --surface: #ffffff;
-            --bg: #f8fafc;
-            --border: #e2e8f0;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --radius: 8px;
+            --radius-sm: 6px;
+            --radius: 10px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            line-height: 1.5;
-        }
-
-        header {
-            background-color: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 2rem;
+            background-color: var(--slate-50);
+            color: var(--slate-900);
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        .header-title {
+        /* Sidebar Navigation */
+        aside {
+            width: 280px;
+            background-color: var(--surface);
+            border-right: 1px solid var(--slate-200);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            z-index: 40;
+            transition: all 0.3s ease;
+        }
+
+        .brand-header {
+            padding: 1.5rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid var(--slate-200);
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), #3b82f6);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(30, 64, 175, 0.3);
+        }
+
+        .brand-meta h2 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--slate-900);
+            letter-spacing: -0.02em;
+        }
+
+        .brand-meta p {
+            font-size: 0.75rem;
+            color: var(--slate-500);
+            font-weight: 500;
+        }
+
+        .author-card {
+            margin: 1rem 1.25rem;
+            padding: 0.85rem 1rem;
+            background: linear-gradient(135deg, var(--primary-50), #f0fdf4);
+            border: 1px solid var(--primary-100);
+            border-radius: var(--radius);
+        }
+
+        .author-card .name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .author-card .sub {
+            font-size: 0.75rem;
+            color: var(--slate-600);
+            margin-top: 0.2rem;
+        }
+
+        nav.menu-list {
+            padding: 0.5rem 0.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.7rem 1rem;
+            border-radius: var(--radius-sm);
+            color: var(--slate-600);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .nav-item:hover {
+            background-color: var(--slate-100);
+            color: var(--slate-900);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary-50);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .nav-item svg {
+            width: 18px;
+            height: 18px;
+            stroke-width: 2;
+        }
+
+        .nav-pill {
+            margin-left: auto;
+            background: var(--warning);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 9999px;
+        }
+
+        .system-status-box {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--slate-200);
+            background: var(--surface);
+            font-size: 0.78rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--success);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(22, 163, 74, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+        }
+
+        /* Main Workspace Content Area */
+        .workspace {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--slate-50);
+        }
+
+        /* Top Bar */
+        header.topbar {
+            height: 64px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--slate-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            flex-shrink: 0;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--slate-900);
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--slate-100);
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-sm);
+            padding: 0.45rem 0.85rem;
+            width: 280px;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 0.85rem;
+            width: 100%;
+            color: var(--slate-900);
+        }
+
+        .topbar-right {
             display: flex;
             align-items: center;
             gap: 0.75rem;
         }
 
-        .logo-badge {
-            background: linear-gradient(135deg, var(--primary), #3b82f6);
-            color: white;
-            padding: 0.5rem 0.75rem;
-            border-radius: var(--radius);
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        .author-badge {
-            background-color: var(--primary-light);
-            color: var(--primary);
-            padding: 0.4rem 0.8rem;
-            border-radius: 9999px;
-            font-size: 0.85rem;
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
             font-weight: 600;
-            border: 1px solid #bfdbfe;
-        }
-
-        nav {
-            display: flex;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 0 2rem;
-            gap: 1.5rem;
-        }
-
-        .nav-tab {
-            padding: 0.85rem 0.25rem;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 500;
             cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s;
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+            text-decoration: none;
         }
 
-        .nav-tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 1px 3px rgba(30, 64, 175, 0.2);
         }
 
-        .container {
-            max-width: 1280px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
         }
 
-        .stats-grid {
+        .btn-outline {
+            background-color: var(--surface);
+            border-color: var(--slate-300);
+            color: var(--slate-700);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--slate-100);
+            color: var(--slate-900);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.35rem 0.7rem;
+            font-size: 0.8rem;
+        }
+
+        /* Scrollable Canvas */
+        main.content-canvas {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        /* KPI Metric Grid */
+        .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
-        .stat-card {
+        .kpi-card {
             background: var(--surface);
-            padding: 1.5rem;
+            border: 1px solid var(--slate-200);
             border-radius: var(--radius);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--primary);
-        }
-
-        .stat-card.warning::before { background: var(--warning); }
-        .stat-card.success::before { background: var(--success); }
-
-        .stat-label {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .stat-val {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-top: 0.5rem;
-            color: var(--text-main);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .section-header {
+        .kpi-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.25rem;
         }
 
-        .btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: var(--radius);
+        .kpi-title {
+            font-size: 0.825rem;
+            text-transform: uppercase;
             font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-size: 0.9rem;
-            display: inline-flex;
+            color: var(--slate-500);
+            letter-spacing: 0.05em;
+        }
+
+        .kpi-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
             align-items: center;
-            gap: 0.5rem;
+            justify-content: center;
         }
 
-        .btn:hover {
-            background-color: var(--primary-hover);
+        .kpi-val {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--slate-900);
+            margin: 0.5rem 0 0.25rem 0;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
         }
 
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-main);
+        .kpi-subtitle {
+            font-size: 0.78rem;
+            color: var(--slate-500);
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
         }
 
-        .btn-outline:hover {
-            background: var(--primary-light);
-            border-color: #bfdbfe;
-            color: var(--primary);
-        }
-
-        .table-card {
+        /* Card Panels */
+        .panel {
             background: var(--surface);
+            border: 1px solid var(--slate-200);
             border-radius: var(--radius);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 2rem;
             overflow: hidden;
         }
 
-        table {
+        .panel-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--slate-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--slate-900);
+        }
+
+        .panel-body {
+            padding: 1.5rem;
+        }
+
+        /* Tables */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table.data-table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
         }
 
-        th {
-            background: #f1f5f9;
-            padding: 0.85rem 1rem;
-            font-size: 0.8rem;
+        table.data-table th {
+            background-color: var(--slate-50);
+            padding: 0.85rem 1.25rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            color: var(--text-muted);
             letter-spacing: 0.05em;
-            border-bottom: 1px solid var(--border);
+            color: var(--slate-500);
+            font-weight: 600;
+            border-bottom: 1px solid var(--slate-200);
         }
 
-        td {
-            padding: 0.85rem 1rem;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.9rem;
+        table.data-table td {
+            padding: 1rem 1.25rem;
+            font-size: 0.875rem;
+            color: var(--slate-700);
+            border-bottom: 1px solid var(--slate-200);
+            vertical-align: middle;
         }
 
-        tr:last-child td {
-            border-bottom: none;
+        table.data-table tr:hover td {
+            background-color: var(--slate-50);
         }
 
-        tr:hover {
-            background-color: #f8fafc;
-        }
-
+        /* Badges */
         .badge {
-            display: inline-block;
-            padding: 0.25rem 0.6rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.65rem;
             border-radius: 9999px;
             font-size: 0.75rem;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 0.02em;
         }
 
-        .badge-success { background: var(--success-light); color: var(--success); }
-        .badge-warning { background: var(--warning-light); color: var(--warning); }
-        .badge-danger { background: var(--danger-light); color: var(--danger); }
-        .badge-info { background: var(--primary-light); color: var(--primary); }
+        .badge-success { background: var(--success-50); color: var(--success); border: 1px solid #bbf7d0; }
+        .badge-warning { background: var(--warning-50); color: var(--warning); border: 1px solid #fde68a; }
+        .badge-danger { background: var(--danger-50); color: var(--danger); border: 1px solid #fecaca; }
+        .badge-info { background: var(--info-50); color: var(--info); border: 1px solid #bfdbfe; }
 
-        /* Modal styling */
-        .modal {
+        /* Progress Bar for Capacity */
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: var(--slate-200);
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 0.4s ease;
+        }
+
+        /* Modal Dialogues */
+        .modal-backdrop {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(15, 23, 42, 0.5);
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.6);
             backdrop-filter: blur(4px);
             z-index: 1000;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            padding: 1rem;
         }
 
-        .modal.open {
+        .modal-backdrop.open {
             display: flex;
         }
 
-        .modal-card {
-            background: white;
-            border-radius: var(--radius);
+        .modal-window {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
             width: 100%;
-            max-width: 520px;
-            padding: 1.5rem;
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            max-width: 580px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--slate-200);
+            animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
 
         .modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--slate-200);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.25rem;
+            justify-content: space-between;
         }
 
-        .modal-close {
-            background: transparent;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-muted);
+        .modal-body {
+            padding: 1.5rem;
+            max-height: 75vh;
+            overflow-y: auto;
         }
 
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--slate-200);
+            background: var(--slate-50);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+
+        /* Forms */
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.25rem;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 0.35rem;
+            font-size: 0.825rem;
+            font-weight: 600;
+            color: var(--slate-700);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.65rem 0.85rem;
+            border: 1px solid var(--slate-300);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            color: var(--slate-900);
+            outline: none;
+            transition: all 0.15s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.15);
+        }
+
+        /* Live Delta Preview Box */
+        .delta-preview-box {
+            background: var(--primary-50);
+            border: 1px solid var(--primary-100);
+            border-radius: var(--radius-sm);
+            padding: 0.85rem 1rem;
+            margin-top: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .deficit-warning {
+            background: var(--danger-50);
+            border: 1px solid #fecaca;
+            color: var(--danger);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem 1rem;
             font-size: 0.85rem;
             font-weight: 600;
-            color: var(--text-main);
+            margin-top: 0.75rem;
+            display: none;
         }
 
-        .form-input, .form-select {
-            width: 100%;
-            padding: 0.6rem 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            font-size: 0.9rem;
-            outline: none;
-        }
-
-        .form-input:focus, .form-select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
-        }
-
-        /* Toast notifications */
-        .toast {
+        /* Toast Notifications */
+        .toast-container {
             position: fixed;
             bottom: 2rem;
             right: 2rem;
-            padding: 1rem 1.5rem;
-            border-radius: var(--radius);
-            color: white;
-            font-weight: 500;
-            box-shadow: var(--shadow);
             z-index: 2000;
-            display: none;
-            animation: slideIn 0.3s ease-out;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
         }
 
-        @keyframes slideIn {
+        .toast {
+            min-width: 320px;
+            max-width: 420px;
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius);
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
             from { transform: translateY(100%); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
 
-        .toast-success { background-color: var(--success); }
-        .toast-error { background-color: var(--danger); }
+        .toast-success { background: #059669; }
+        .toast-error { background: #dc2626; }
+        .toast-conflict { background: #d97706; }
 
-        .api-card {
-            background: white;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-        }
-
-        .api-method {
-            display: inline-block;
-            font-weight: bold;
+        /* Code display */
+        code.sku-pill {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            background: var(--slate-100);
+            color: var(--slate-800);
             padding: 0.2rem 0.5rem;
             border-radius: 4px;
             font-size: 0.8rem;
-            margin-right: 0.5rem;
+            border: 1px solid var(--slate-200);
         }
 
-        .method-get { background: #dbeafe; color: #1e40af; }
-        .method-post { background: #dcfce7; color: #166534; }
-        .method-put { background: #fef3c7; color: #92400e; }
-        .method-delete { background: #fee2e2; color: #991b1b; }
+        /* Screen views */
+        .screen-view {
+            display: none;
+        }
+
+        .screen-view.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="header-title">
-            <div class="logo-badge">SMS</div>
-            <div>
-                <h1 style="font-size: 1.25rem; font-weight: 700;">Stock Management System</h1>
-                <p style="font-size: 0.8rem; color: var(--text-muted);">AUCA Web Technology — Enterprise Application Portal</p>
+    <!-- Left Sidebar Navigation -->
+    <aside>
+        <div class="brand-header">
+            <div class="brand-logo">SC</div>
+            <div class="brand-meta">
+                <h2>StockCore ERP</h2>
+                <p>Enterprise Inventory Platform</p>
             </div>
         </div>
-        <div class="author-badge">
-            👨‍💻 Iradukunda Fils | ID: 29853 | Group B
+
+        <div class="author-card">
+            <div class="name">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                Iradukunda Fils
+            </div>
+            <div class="sub">AUCA WebTech | ID: 29853 | Group B</div>
         </div>
-    </header>
 
-    <nav>
-        <div class="nav-tab active" onclick="switchTab('dashboard')">📊 Dashboard</div>
-        <div class="nav-tab" onclick="switchTab('warehouses')">🏢 Warehouses</div>
-        <div class="nav-tab" onclick="switchTab('products')">📦 Products</div>
-        <div class="nav-tab" onclick="switchTab('movements')">🔄 Stock Movements</div>
-        <div class="nav-tab" onclick="switchTab('api')">🔌 REST API Docs</div>
-    </nav>
+        <nav class="menu-list">
+            <div class="nav-item active" onclick="navigate('dashboard')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg>
+                Dashboard
+            </div>
+            <div class="nav-item" onclick="navigate('warehouses')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18"></path><path d="M19 21v-4"></path><path d="M19 17l-7-5-7 5"></path><path d="M5 21v-4"></path><path d="M5 10l7-5 7 5v7H5z"></path></svg>
+                Warehouses
+            </div>
+            <div class="nav-item" onclick="navigate('products')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg>
+                Product Catalog
+            </div>
+            <div class="nav-item" onclick="navigate('movements')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m16 3 4 4-4 4"></path><path d="M20 7H4"></path><path d="m8 21-4-4 4-4"></path><path d="M4 17h16"></path></svg>
+                Stock Movements
+            </div>
+            <div class="nav-item" onclick="navigate('lowstock')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                Low Stock Alerts
+                <span class="nav-pill" id="badge-low-stock">0</span>
+            </div>
+            <div class="nav-item" onclick="navigate('api')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m18 16 4-4-4-4"></path><path d="m6 8-4 4 4 4"></path><path d="m14.5 4-5 16"></path></svg>
+                REST API Reference
+            </div>
+        </nav>
 
-    <main class="container">
-        <!-- Dashboard Overview Tab -->
-        <div id="tab-dashboard" class="tab-content active">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Total Warehouses</div>
-                    <div class="stat-val" id="stat-warehouses">0</div>
+        <div class="system-status-box">
+            <div class="status-badge">
+                <span class="status-dot"></span> System Operational
+            </div>
+            <p style="color: var(--slate-500);">PostgreSQL 16 • Optimistic Lock (@Version) • JPA Auditing Active</p>
+        </div>
+    </aside>
+
+    <!-- Main Workspace Area -->
+    <div class="workspace">
+        <!-- Top Sticky Header -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <h1 class="page-title" id="screen-heading">Executive Dashboard</h1>
+                <div class="search-box">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="global-search" placeholder="Search SKU, warehouse, product..." oninput="handleGlobalSearch(this.value)">
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Cataloged Products</div>
-                    <div class="stat-val" id="stat-products">0</div>
+            </div>
+            <div class="topbar-right">
+                <button class="btn btn-outline" onclick="loadAllData()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    Refresh
+                </button>
+                <button class="btn btn-outline" onclick="openModal('modal-warehouse')">
+                    + New Warehouse
+                </button>
+                <button class="btn btn-outline" onclick="openModal('modal-product')">
+                    + New Product
+                </button>
+                <button class="btn btn-primary" onclick="openModal('modal-movement')">
+                    ⚡ Record Movement
+                </button>
+            </div>
+        </header>
+
+        <!-- Canvas Body -->
+        <main class="content-canvas">
+
+            <!-- Screen 1: Dashboard View -->
+            <section id="view-dashboard" class="screen-view active">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span class="kpi-title">Active Facilities</span>
+                            <div class="kpi-icon" style="background: var(--primary-50); color: var(--primary);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M19 21v-4l-7-5-7 5v4"/></svg>
+                            </div>
+                        </div>
+                        <div class="kpi-val" id="kpi-warehouses">0</div>
+                        <div class="kpi-subtitle">Storage locations active</div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span class="kpi-title">Cataloged SKUs</span>
+                            <div class="kpi-icon" style="background: var(--info-50); color: var(--info);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg>
+                            </div>
+                        </div>
+                        <div class="kpi-val" id="kpi-products">0</div>
+                        <div class="kpi-subtitle">Unique inventory products</div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <span class="kpi-title">Total Units in Stock</span>
+                            <div class="kpi-icon" style="background: var(--success-50); color: var(--success);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7.5 4.27 9 5.15M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg>
+                            </div>
+                        </div>
+                        <div class="kpi-val" id="kpi-units">0</div>
+                        <div class="kpi-subtitle">Physical units in storage</div>
+                    </div>
+
+                    <div class="kpi-card" style="cursor: pointer;" onclick="navigate('lowstock')">
+                        <div class="kpi-header">
+                            <span class="kpi-title">Low Stock Alerts</span>
+                            <div class="kpi-icon" style="background: var(--warning-50); color: var(--warning);">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/></svg>
+                            </div>
+                        </div>
+                        <div class="kpi-val" id="kpi-low-stock" style="color: var(--warning);">0</div>
+                        <div class="kpi-subtitle">SKUs at or below reorder level</div>
+                    </div>
                 </div>
-                <div class="stat-card success">
-                    <div class="stat-label">Total Units in Stock</div>
-                    <div class="stat-val" id="stat-units">0</div>
+
+                <!-- Warehouse Capacity Gauges -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title">Warehouse Capacity Utilization</h3>
+                        <span style="font-size: 0.8rem; color: var(--slate-500);">Live Occupancy vs Maximum Capacity</span>
+                    </div>
+                    <div class="panel-body" id="warehouse-capacity-list">
+                        <p style="color: var(--slate-500);">Loading warehouse metrics...</p>
+                    </div>
                 </div>
-                <div class="stat-card warning">
-                    <div class="stat-label">Low Stock Alerts</div>
-                    <div class="stat-val" id="stat-low-stock">0</div>
+
+                <!-- Recent Activity Feed -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title">Recent Stock Activity</h3>
+                        <button class="btn btn-outline btn-sm" onclick="navigate('movements')">View Complete Ledger</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Ref Code</th>
+                                    <th>Timestamp</th>
+                                    <th>Movement Type</th>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Stock Flow</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-movements-tbody">
+                                <tr><td colspan="6" style="text-align: center; color: var(--slate-500);">Loading recent movements...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="section-header">
-                <h2>System Overview & Health</h2>
-                <button class="btn btn-outline" onclick="loadAllData()">🔄 Refresh Data</button>
-            </div>
-
-            <div class="table-card" style="padding: 1.5rem; margin-bottom: 2rem;">
-                <h3 style="margin-bottom: 0.5rem;">🟢 System Status: Operational</h3>
-                <p style="color: var(--text-muted); margin-bottom: 1rem;">
-                    PostgreSQL 16 persistence active with Optimistic Locking (<code>@Version</code>), automatic JPA user auditing, safe pagination, and multi-thread thread safety.
-                </p>
-                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                    <button class="btn" onclick="openModal('modal-movement')">⚡ Record Stock Movement</button>
-                    <button class="btn btn-outline" onclick="openModal('modal-product')">➕ New Product</button>
-                    <button class="btn btn-outline" onclick="openModal('modal-warehouse')">➕ New Warehouse</button>
+            <!-- Screen 2: Warehouses View -->
+            <section id="view-warehouses" class="screen-view">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h3 class="panel-title">Warehouse Storage Facilities</h3>
+                            <p style="font-size: 0.8rem; color: var(--slate-500);">Multi-facility directory with location and capacity management</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openModal('modal-warehouse')">+ Register Warehouse</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Warehouse Code</th>
+                                    <th>Facility Name</th>
+                                    <th>Location</th>
+                                    <th>Capacity Usage</th>
+                                    <th>Contact Email</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="warehouses-tbody">
+                                <tr><td colspan="6" style="text-align: center; color: var(--slate-500);">Loading warehouses...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </section>
 
-        <!-- Warehouses Tab -->
-        <div id="tab-warehouses" class="tab-content">
-            <div class="section-header">
-                <h2>Warehouse Facilities</h2>
-                <button class="btn" onclick="openModal('modal-warehouse')">➕ Add Warehouse</button>
-            </div>
-            <div class="table-card">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Code</th>
-                            <th>Name</th>
-                            <th>Location</th>
-                            <th>Capacity</th>
-                            <th>Contact Email</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-warehouses">
-                        <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading warehouses...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+            <!-- Screen 3: Product Catalog View -->
+            <section id="view-products" class="screen-view">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h3 class="panel-title">Product Inventory Catalog</h3>
+                            <p style="font-size: 0.8rem; color: var(--slate-500);">Track SKU units, unit pricing, warehouse allocation, and alert thresholds</p>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button class="btn btn-outline" onclick="toggleLowStockFilter(this)" id="btn-filter-low-stock">
+                                ⚠️ Show Low Stock Only
+                            </button>
+                            <button class="btn btn-primary" onclick="openModal('modal-product')">+ Add New Product</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Product Name</th>
+                                    <th>Warehouse</th>
+                                    <th>Unit Price</th>
+                                    <th>Quantity In Stock</th>
+                                    <th>Reorder Level</th>
+                                    <th>Inventory Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="products-tbody">
+                                <tr><td colspan="8" style="text-align: center; color: var(--slate-500);">Loading products...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
 
-        <!-- Products Tab -->
-        <div id="tab-products" class="tab-content">
-            <div class="section-header">
-                <h2>Inventory Products</h2>
-                <button class="btn" onclick="openModal('modal-product')">➕ Add Product</button>
-            </div>
-            <div class="table-card">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>SKU</th>
-                            <th>Product Name</th>
-                            <th>Warehouse</th>
-                            <th>Unit Price</th>
-                            <th>Stock</th>
-                            <th>Threshold</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-products">
-                        <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading products...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+            <!-- Screen 4: Stock Movement Audit Ledger View -->
+            <section id="view-movements" class="screen-view">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h3 class="panel-title">Stock Movement Audit Trail</h3>
+                            <p style="font-size: 0.8rem; color: var(--slate-500);">ACID-compliant transactional ledger of all inventory operations</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="openModal('modal-movement')">⚡ Record Movement</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Reference Code</th>
+                                    <th>Date & Time</th>
+                                    <th>Type</th>
+                                    <th>Quantity</th>
+                                    <th>Stock Mutation</th>
+                                    <th>Notes</th>
+                                    <th>Audited By</th>
+                                </tr>
+                            </thead>
+                            <tbody id="movements-tbody">
+                                <tr><td colspan="7" style="text-align: center; color: var(--slate-500);">Loading movements ledger...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
 
-        <!-- Movements Tab -->
-        <div id="tab-movements" class="tab-content">
-            <div class="section-header">
-                <h2>Stock Movement Audit Log</h2>
-                <button class="btn" onclick="openModal('modal-movement')">⚡ Record Movement</button>
-            </div>
-            <div class="table-card">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Reference</th>
-                            <th>Date / Time</th>
-                            <th>Type</th>
-                            <th>Quantity</th>
-                            <th>Stock Flow</th>
-                            <th>Notes</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-movements">
-                        <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading movement history...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+            <!-- Screen 5: Low Stock Command Center -->
+            <section id="view-lowstock" class="screen-view">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h3 class="panel-title" style="color: var(--warning);">⚠️ Low Stock Replenishment Center</h3>
+                            <p style="font-size: 0.8rem; color: var(--slate-500);">Critical items requiring immediate purchase requisition or warehouse transfer</p>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Product Name</th>
+                                    <th>Facility</th>
+                                    <th>Current Stock</th>
+                                    <th>Reorder Level</th>
+                                    <th>Deficit Units</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lowstock-tbody">
+                                <tr><td colspan="7" style="text-align: center; color: var(--slate-500);">Checking low stock items...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
 
-        <!-- REST API Docs Tab -->
-        <div id="tab-api" class="tab-content">
-            <div class="section-header">
-                <h2>Available REST Endpoints (/api/v1)</h2>
-                <a href="/StockManagementSystem.postman_collection.json" download class="btn btn-outline">📥 Download Postman Collection</a>
-            </div>
+            <!-- Screen 6: REST API Documentation -->
+            <section id="view-api" class="screen-view">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title">REST API Endpoints & Developer Reference</h3>
+                        <a href="/StockManagementSystem.postman_collection.json" download class="btn btn-outline btn-sm">
+                            📥 Download Postman Collection
+                        </a>
+                    </div>
+                    <div class="panel-body">
+                        <p style="color: var(--slate-600); margin-bottom: 1.5rem;">
+                            All backend APIs adhere to RESTful standards, RFC 7807 error responses, JPA user auditing headers (<code>X-User-Id</code>), and Optimistic Concurrency Locking.
+                        </p>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="padding: 1rem; border: 1px solid var(--slate-200); border-radius: var(--radius-sm); background: white;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                                    <span class="badge badge-info">GET</span>
+                                    <code>/api/v1/warehouses</code>
+                                </div>
+                                <p style="font-size: 0.85rem; color: var(--slate-600);">Retrieve all warehouse facilities with capacity and occupancy metrics.</p>
+                            </div>
+                            <div style="padding: 1rem; border: 1px solid var(--slate-200); border-radius: var(--radius-sm); background: white;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                                    <span class="badge badge-success">POST</span>
+                                    <code>/api/v1/warehouses</code>
+                                </div>
+                                <p style="font-size: 0.85rem; color: var(--slate-600);">Register a warehouse. Enforces unique warehouseCode and non-negative capacity.</p>
+                            </div>
+                            <div style="padding: 1rem; border: 1px solid var(--slate-200); border-radius: var(--radius-sm); background: white;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                                    <span class="badge badge-info">GET</span>
+                                    <code>/api/v1/products</code>
+                                </div>
+                                <p style="font-size: 0.85rem; color: var(--slate-600);">List all products. Computes <code>isLowStock</code> dynamically against <code>reorderLevel</code>.</p>
+                            </div>
+                            <div style="padding: 1rem; border: 1px solid var(--slate-200); border-radius: var(--radius-sm); background: white;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                                    <span class="badge badge-info">GET</span>
+                                    <code>/api/v1/products/paged?page=0&size=10</code>
+                                </div>
+                                <p style="font-size: 0.85rem; color: var(--slate-600);">Safe paginated product endpoint preventing server heap exhaustion.</p>
+                            </div>
+                            <div style="padding: 1rem; border: 1px solid var(--slate-200); border-radius: var(--radius-sm); background: white;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                                    <span class="badge badge-success">POST</span>
+                                    <code>/api/v1/stock-movements</code>
+                                </div>
+                                <p style="font-size: 0.85rem; color: var(--slate-600);">Execute atomic <code>STOCK_IN</code>, <code>STOCK_OUT</code>, or <code>ADJUSTMENT</code> with optimistic lock checking.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-            <div class="api-card">
-                <span class="api-method method-get">GET</span>
-                <strong style="font-family: monospace;">/api/v1/warehouses</strong>
-                <p style="color: var(--text-muted); margin-top: 0.25rem;">Retrieve all warehouse facilities with capacity and contact information.</p>
-            </div>
+        </main>
+    </div>
 
-            <div class="api-card">
-                <span class="api-method method-post">POST</span>
-                <strong style="font-family: monospace;">/api/v1/warehouses</strong>
-                <p style="color: var(--text-muted); margin-top: 0.25rem;">Register a new warehouse facility (validates uniqueness of warehouseCode).</p>
-            </div>
-
-            <div class="api-card">
-                <span class="api-method method-get">GET</span>
-                <strong style="font-family: monospace;">/api/v1/products</strong>
-                <p style="color: var(--text-muted); margin-top: 0.25rem;">Retrieve all cataloged products along with low-stock status calculation.</p>
-            </div>
-
-            <div class="api-card">
-                <span class="api-method method-get">GET</span>
-                <strong style="font-family: monospace;">/api/v1/products/paged?page=0&size=10</strong>
-                <p style="color: var(--text-muted); margin-top: 0.25rem;">Safe paginated endpoint preventing heap exhaustion on large inventories.</p>
-            </div>
-
-            <div class="api-card">
-                <span class="api-method method-post">POST</span>
-                <strong style="font-family: monospace;">/api/v1/stock-movements</strong>
-                <p style="color: var(--text-muted); margin-top: 0.25rem;">Execute atomic STOCK_IN, STOCK_OUT, or ADJUSTMENT mutation with optimistic concurrency check.</p>
-            </div>
-        </div>
-    </main>
-
-    <!-- Modal: Add Warehouse -->
-    <div id="modal-warehouse" class="modal">
-        <div class="modal-card">
+    <!-- Modal 1: Register Warehouse -->
+    <div id="modal-warehouse" class="modal-backdrop">
+        <div class="modal-window">
             <div class="modal-header">
-                <h3>Register New Warehouse</h3>
-                <button class="modal-close" onclick="closeModal('modal-warehouse')">&times;</button>
+                <h3 style="font-size: 1.1rem; font-weight: 700;">Register Warehouse Facility</h3>
+                <button onclick="closeModal('modal-warehouse')" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--slate-400);">&times;</button>
             </div>
             <form id="form-warehouse" onsubmit="submitWarehouse(event)">
-                <div class="form-group">
-                    <label class="form-label">Warehouse Code</label>
-                    <input type="text" id="wh-code" class="form-input" placeholder="e.g. WH-KGL-001" required>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Warehouse Code *</label>
+                        <input type="text" id="wh-code" class="form-control" placeholder="e.g. WH-KGL-001" required>
+                        <span style="font-size: 0.75rem; color: var(--slate-500);">Unique uppercase facility identifier</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Facility Name *</label>
+                        <input type="text" id="wh-name" class="form-control" placeholder="e.g. Kigali Central Hub" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Location / Address *</label>
+                        <input type="text" id="wh-location" class="form-control" placeholder="e.g. Masaka, Kicukiro, Kigali" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Storage Capacity (Units) *</label>
+                        <input type="number" id="wh-capacity" class="form-control" placeholder="e.g. 10000" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Manager Contact Email</label>
+                        <input type="email" id="wh-email" class="form-control" placeholder="logistics@auca.ac.rw">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Warehouse Name</label>
-                    <input type="text" id="wh-name" class="form-input" placeholder="e.g. Kigali Central Hub" required>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('modal-warehouse')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Facility</button>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Location</label>
-                    <input type="text" id="wh-location" class="form-input" placeholder="e.g. Masaka, Kigali" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Storage Capacity</label>
-                    <input type="number" id="wh-capacity" class="form-input" placeholder="e.g. 5000" min="1" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Contact Email</label>
-                    <input type="email" id="wh-email" class="form-input" placeholder="manager@warehouse.rw">
-                </div>
-                <button type="submit" class="btn" style="width: 100%;">Create Warehouse</button>
             </form>
         </div>
     </div>
 
-    <!-- Modal: Add Product -->
-    <div id="modal-product" class="modal">
-        <div class="modal-card">
+    <!-- Modal 2: Register Product -->
+    <div id="modal-product" class="modal-backdrop">
+        <div class="modal-window">
             <div class="modal-header">
-                <h3>Register New Product</h3>
-                <button class="modal-close" onclick="closeModal('modal-product')">&times;</button>
+                <h3 style="font-size: 1.1rem; font-weight: 700;">Catalog New Product</h3>
+                <button onclick="closeModal('modal-product')" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--slate-400);">&times;</button>
             </div>
             <form id="form-product" onsubmit="submitProduct(event)">
-                <div class="form-group">
-                    <label class="form-label">Product SKU</label>
-                    <input type="text" id="prod-sku" class="form-input" placeholder="e.g. PRD-LAP-001" required>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Product SKU *</label>
+                        <input type="text" id="prod-sku" class="form-control" placeholder="e.g. SKU-LAP-001" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Product Name *</label>
+                        <input type="text" id="prod-name" class="form-control" placeholder="e.g. Dell Latitude 5540" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Assigned Warehouse Facility *</label>
+                        <select id="prod-warehouse" class="form-control" required>
+                            <option value="">Select storage warehouse...</option>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Unit Price ($) *</label>
+                            <input type="number" id="prod-price" class="form-control" step="0.01" min="0" placeholder="850.00" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Initial Quantity *</label>
+                            <input type="number" id="prod-stock" class="form-control" min="0" placeholder="50" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Low Stock Reorder Threshold *</label>
+                        <input type="number" id="prod-threshold" class="form-control" min="1" placeholder="15" required>
+                        <span style="font-size: 0.75rem; color: var(--slate-500);">System triggers alert when stock drops to or below this count</span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Product Name</label>
-                    <input type="text" id="prod-name" class="form-input" placeholder="e.g. Dell XPS 15" required>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('modal-product')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Catalog Product</button>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Warehouse</label>
-                    <select id="prod-warehouse" class="form-select" required>
-                        <option value="">Select Warehouse...</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Unit Price ($)</label>
-                    <input type="number" id="prod-price" class="form-input" step="0.01" min="0" placeholder="1200.00" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Initial Stock Quantity</label>
-                    <input type="number" id="prod-stock" class="form-input" min="0" placeholder="50" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Reorder / Alert Threshold</label>
-                    <input type="number" id="prod-threshold" class="form-input" min="1" placeholder="10" required>
-                </div>
-                <button type="submit" class="btn" style="width: 100%;">Create Product</button>
             </form>
         </div>
     </div>
 
-    <!-- Modal: Record Movement -->
-    <div id="modal-movement" class="modal">
-        <div class="modal-card">
+    <!-- Modal 3: Record Movement (With Live Deficit Protection & Calculation) -->
+    <div id="modal-movement" class="modal-backdrop">
+        <div class="modal-window">
             <div class="modal-header">
-                <h3>Record Stock Movement</h3>
-                <button class="modal-close" onclick="closeModal('modal-movement')">&times;</button>
+                <h3 style="font-size: 1.1rem; font-weight: 700;">Record Stock Movement</h3>
+                <button onclick="closeModal('modal-movement')" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--slate-400);">&times;</button>
             </div>
             <form id="form-movement" onsubmit="submitMovement(event)">
-                <div class="form-group">
-                    <label class="form-label">Product</label>
-                    <select id="mov-product" class="form-select" required>
-                        <option value="">Select Product...</option>
-                    </select>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Select Target Product *</label>
+                        <select id="mov-product" class="form-control" required onchange="calculateStockDelta()">
+                            <option value="">Choose product SKU...</option>
+                        </select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Movement Type *</label>
+                            <select id="mov-type" class="form-control" required onchange="calculateStockDelta()">
+                                <option value="STOCK_IN">STOCK_IN (Receiving)</option>
+                                <option value="STOCK_OUT">STOCK_OUT (Dispatch / Sales)</option>
+                                <option value="ADJUSTMENT">ADJUSTMENT (Audit Reconciliation)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Quantity *</label>
+                            <input type="number" id="mov-qty" class="form-control" min="1" placeholder="10" required oninput="calculateStockDelta()">
+                        </div>
+                    </div>
+
+                    <!-- Live Calculation Preview -->
+                    <div class="delta-preview-box" id="delta-box">
+                        <div>
+                            <span style="font-size: 0.75rem; color: var(--slate-500); display: block;">Current Stock</span>
+                            <strong id="preview-current-stock">0 units</strong>
+                        </div>
+                        <div style="font-size: 1.25rem; font-weight: bold; color: var(--primary);">&rarr;</div>
+                        <div>
+                            <span style="font-size: 0.75rem; color: var(--slate-500); display: block;">Resulting Balance</span>
+                            <strong id="preview-resulting-stock" style="color: var(--success);">0 units</strong>
+                        </div>
+                    </div>
+
+                    <!-- Deficit Protection Alert -->
+                    <div class="deficit-warning" id="deficit-alert">
+                        ⚠️ Deficit Rejection Guard: Requested STOCK_OUT quantity exceeds available inventory. Operation will be blocked!
+                    </div>
+
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                            <label class="form-label" style="margin-bottom: 0;">Reference Code *</label>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="generateRefCode()" style="padding: 0.15rem 0.5rem; font-size: 0.75rem;">Auto-Generate</button>
+                        </div>
+                        <input type="text" id="mov-ref" class="form-control" placeholder="e.g. PO-20261004-001" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Transaction Notes / Reason</label>
+                        <input type="text" id="mov-notes" class="form-control" placeholder="e.g. Quarterly replenishment order #412">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Movement Type</label>
-                    <select id="mov-type" class="form-select" required>
-                        <option value="STOCK_IN">STOCK_IN (Receiving Inventory)</option>
-                        <option value="STOCK_OUT">STOCK_OUT (Discharging / Sales)</option>
-                        <option value="ADJUSTMENT">ADJUSTMENT (Audit Reconciliation)</option>
-                    </select>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('modal-movement')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-movement">Confirm & Record</button>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Quantity</label>
-                    <input type="number" id="mov-quantity" class="form-input" min="1" placeholder="10" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Reference Code</label>
-                    <input type="text" id="mov-ref" class="form-input" placeholder="e.g. PO-2026-001" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Notes</label>
-                    <input type="text" id="mov-notes" class="form-input" placeholder="Supplier shipment #441">
-                </div>
-                <button type="submit" class="btn" style="width: 100%;">Process Transaction</button>
             </form>
         </div>
     </div>
 
-    <!-- Toast Component -->
-    <div id="toast" class="toast"></div>
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toast-shelf"></div>
 
     <script>
-        let cachedWarehouses = [];
-        let cachedProducts = [];
+        let warehouses = [];
+        let products = [];
+        let movements = [];
+        let showOnlyLowStock = false;
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        // Screen Navigation
+        function navigate(screenId) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.screen-view').forEach(el => el.classList.remove('active'));
 
-            const activeTabBtn = Array.from(document.querySelectorAll('.nav-tab')).find(t => t.getAttribute('onclick').includes(tabId));
-            if (activeTabBtn) activeTabBtn.classList.add('active');
+            const navItem = Array.from(document.querySelectorAll('.nav-item')).find(el => 
+                el.getAttribute('onclick') && el.getAttribute('onclick').includes(screenId)
+            );
+            if (navItem) navItem.classList.add('active');
 
-            const content = document.getElementById('tab-' + tabId);
-            if (content) content.classList.add('active');
+            const view = document.getElementById('view-' + screenId);
+            if (view) view.classList.add('active');
+
+            const titles = {
+                dashboard: 'Executive Dashboard',
+                warehouses: 'Warehouse Facilities',
+                products: 'Product Inventory Catalog',
+                movements: 'Stock Movement Audit Ledger',
+                lowstock: 'Low Stock Alert Center',
+                api: 'REST API Reference & Docs'
+            };
+            document.getElementById('screen-heading').textContent = titles[screenId] || 'Stock Management';
         }
 
         function openModal(id) {
             document.getElementById(id).classList.add('open');
-            populateSelects();
+            populateDropdowns();
+            if (id === 'modal-movement') {
+                generateRefCode();
+                calculateStockDelta();
+            }
         }
 
         function closeModal(id) {
             document.getElementById(id).classList.remove('open');
         }
 
-        function showToast(msg, isError = false) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.className = 'toast ' + (isError ? 'toast-error' : 'toast-success');
-            toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 4000);
+        function showToast(msg, type = 'success') {
+            const shelf = document.getElementById('toast-shelf');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                <span>${msg}</span>
+            `;
+            shelf.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4500);
         }
 
+        // Data Fetching
         async function loadAllData() {
-            await Promise.all([loadWarehouses(), loadProducts(), loadMovements()]);
-            updateDashboardMetrics();
+            try {
+                await Promise.all([fetchWarehouses(), fetchProducts(), fetchMovements()]);
+                renderDashboardMetrics();
+                renderWarehousesTable();
+                renderProductsTable();
+                renderMovementsTable();
+                renderLowStockTable();
+            } catch (err) {
+                console.error("Failed to load inventory data:", err);
+                showToast("Error synchronizing backend data", "error");
+            }
         }
 
-        async function loadWarehouses() {
-            try {
-                const res = await fetch('/api/v1/warehouses');
-                const data = await res.json();
-                cachedWarehouses = data.data || [];
-                const tbody = document.getElementById('tbody-warehouses');
-                if (cachedWarehouses.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No warehouses registered yet.</td></tr>';
-                    return;
-                }
-                tbody.innerHTML = cachedWarehouses.map(w => `
+        async function fetchWarehouses() {
+            const res = await fetch('/api/v1/warehouses');
+            const json = await res.json();
+            warehouses = json.data || [];
+        }
+
+        async function fetchProducts() {
+            const res = await fetch('/api/v1/products');
+            const json = await res.json();
+            products = json.data || [];
+        }
+
+        async function fetchMovements() {
+            const res = await fetch('/api/v1/stock-movements');
+            const json = await res.json();
+            movements = json.data || [];
+        }
+
+        // Render Dashboard Metrics & Gauges
+        function renderDashboardMetrics() {
+            document.getElementById('kpi-warehouses').textContent = warehouses.length;
+            document.getElementById('kpi-products').textContent = products.length;
+            
+            const totalUnits = products.reduce((acc, p) => acc + (p.quantityInStock || 0), 0);
+            document.getElementById('kpi-units').textContent = totalUnits.toLocaleString();
+
+            const lowStockCount = products.filter(p => p.isLowStock).length;
+            document.getElementById('kpi-low-stock').textContent = lowStockCount;
+            document.getElementById('badge-low-stock').textContent = lowStockCount;
+
+            // Render Capacity Utilization
+            const container = document.getElementById('warehouse-capacity-list');
+            if (warehouses.length === 0) {
+                container.innerHTML = '<p style="color: var(--slate-500);">No warehouses registered yet.</p>';
+                return;
+            }
+
+            container.innerHTML = warehouses.map(w => {
+                // Sum stock in this warehouse
+                const currentStock = products.filter(p => p.warehouseId === w.id)
+                                             .reduce((sum, p) => sum + (p.quantityInStock || 0), 0);
+                const percent = Math.min(100, Math.round((currentStock / (w.capacity || 1)) * 100));
+                
+                let color = 'var(--success)';
+                if (percent > 90) color = 'var(--danger)';
+                else if (percent > 70) color = 'var(--warning)';
+
+                return `
+                    <div style="margin-bottom: 1.25rem;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600;">
+                            <span>${w.warehouseName} (<code class="sku-pill">${w.warehouseCode}</code>) — ${w.location}</span>
+                            <span>${currentStock.toLocaleString()} / ${w.capacity.toLocaleString()} units (${percent}%)</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" style="width: ${percent}%; background: ${color};"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Render Recent 5 movements
+            const recent = movements.slice(0, 5);
+            const recentTbody = document.getElementById('recent-movements-tbody');
+            if (recent.length === 0) {
+                recentTbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--slate-500);">No recent movements recorded.</td></tr>';
+                return;
+            }
+            recentTbody.innerHTML = recent.map(m => `
+                <tr>
+                    <td><code class="sku-pill">${m.referenceCode}</code></td>
+                    <td>${new Date(m.movementDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}</td>
+                    <td><span class="badge ${m.movementType === 'STOCK_IN' ? 'badge-success' : (m.movementType === 'STOCK_OUT' ? 'badge-warning' : 'badge-info')}">${m.movementType}</span></td>
+                    <td><strong>${m.productName || 'Product'}</strong></td>
+                    <td><strong>${m.quantity}</strong></td>
+                    <td>${m.previousStock} &rarr; <strong>${m.resultingStock}</strong></td>
+                </tr>
+            `).join('');
+        }
+
+        // Render Warehouses Table
+        function renderWarehousesTable() {
+            const tbody = document.getElementById('warehouses-tbody');
+            if (warehouses.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--slate-500); padding: 2rem;">No warehouse facilities registered yet.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = warehouses.map(w => {
+                const stock = products.filter(p => p.warehouseId === w.id).reduce((sum, p) => sum + (p.quantityInStock || 0), 0);
+                const percent = Math.min(100, Math.round((stock / w.capacity) * 100));
+                return `
                     <tr>
-                        <td><strong>${w.warehouseCode}</strong></td>
-                        <td>${w.warehouseName}</td>
+                        <td><code class="sku-pill">${w.warehouseCode}</code></td>
+                        <td><strong>${w.warehouseName}</strong></td>
                         <td>${w.location}</td>
-                        <td>${w.capacity.toLocaleString()} units</td>
+                        <td>
+                            <div>${stock} / ${w.capacity.toLocaleString()} units (${percent}%)</div>
+                            <div class="progress-bar-container" style="height: 6px; width: 150px;">
+                                <div class="progress-bar-fill" style="width: ${percent}%; background: ${percent > 90 ? 'var(--danger)' : 'var(--primary)'};"></div>
+                            </div>
+                        </td>
                         <td>${w.contactEmail || '—'}</td>
                         <td><span class="badge badge-success">ACTIVE</span></td>
                     </tr>
-                `).join('');
-            } catch (err) {
-                console.error(err);
-            }
+                `;
+            }).join('');
         }
 
-        async function loadProducts() {
-            try {
-                const res = await fetch('/api/v1/products');
-                const data = await res.json();
-                cachedProducts = data.data || [];
-                const tbody = document.getElementById('tbody-products');
-                if (cachedProducts.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No products registered yet.</td></tr>';
-                    return;
+        // Render Products Table
+        function renderProductsTable(filteredList = null) {
+            const list = filteredList || (showOnlyLowStock ? products.filter(p => p.isLowStock) : products);
+            const tbody = document.getElementById('products-tbody');
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--slate-500); padding: 2rem;">No inventory products found matching criteria.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = list.map(p => {
+                let badge = '<span class="badge badge-success">IN STOCK</span>';
+                if (p.quantityInStock === 0) {
+                    badge = '<span class="badge badge-danger">OUT OF STOCK</span>';
+                } else if (p.isLowStock) {
+                    badge = '<span class="badge badge-warning">⚠️ LOW STOCK</span>';
                 }
-                tbody.innerHTML = cachedProducts.map(p => `
+
+                // Deletion guard: disabled if stock > 0
+                const canDelete = p.quantityInStock === 0;
+                const deleteBtn = canDelete 
+                    ? `<button class="btn btn-outline btn-sm" style="color: var(--danger);" onclick="deleteProduct('${p.id}', '${p.productName}')">Delete</button>`
+                    : `<button class="btn btn-outline btn-sm" style="opacity: 0.5; cursor: not-allowed;" title="Cannot delete product with units in stock (> 0)" disabled>Locked</button>`;
+
+                return `
                     <tr>
-                        <td><code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">${p.sku}</code></td>
+                        <td><code class="sku-pill">${p.sku}</code></td>
                         <td><strong>${p.productName}</strong></td>
                         <td>${p.warehouseName || 'Assigned'}</td>
-                        <td>$${p.price.toFixed(2)}</td>
-                        <td><strong>${p.quantityInStock}</strong></td>
+                        <td>$${parseFloat(p.price).toFixed(2)}</td>
+                        <td><strong style="font-size: 1rem;">${p.quantityInStock}</strong></td>
                         <td>${p.reorderLevel}</td>
-                        <td>
-                            ${p.isLowStock 
-                                ? '<span class="badge badge-danger">LOW STOCK</span>' 
-                                : '<span class="badge badge-success">IN STOCK</span>'}
+                        <td>${badge}</td>
+                        <td style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-outline btn-sm" onclick="quickStockMovement('${p.id}')">⚡ Move</button>
+                            ${deleteBtn}
                         </td>
                     </tr>
-                `).join('');
-            } catch (err) {
-                console.error(err);
-            }
+                `;
+            }).join('');
         }
 
-        async function loadMovements() {
-            try {
-                const res = await fetch('/api/v1/stock-movements');
-                const data = await res.json();
-                const movements = data.data || [];
-                const tbody = document.getElementById('tbody-movements');
-                if (movements.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No stock movements recorded yet.</td></tr>';
-                    return;
-                }
-                tbody.innerHTML = movements.map(m => `
+        // Render Movements Table
+        function renderMovementsTable() {
+            const tbody = document.getElementById('movements-tbody');
+            if (movements.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--slate-500); padding: 2rem;">No stock movements recorded yet.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = movements.map(m => `
+                <tr>
+                    <td><code class="sku-pill">${m.referenceCode}</code></td>
+                    <td>${new Date(m.movementDate).toLocaleString()}</td>
+                    <td>
+                        <span class="badge ${m.movementType === 'STOCK_IN' ? 'badge-success' : (m.movementType === 'STOCK_OUT' ? 'badge-warning' : 'badge-info')}">
+                            ${m.movementType}
+                        </span>
+                    </td>
+                    <td><strong>${m.quantity}</strong></td>
+                    <td>${m.previousStock} &rarr; <strong>${m.resultingStock}</strong></td>
+                    <td>${m.notes || '—'}</td>
+                    <td><span style="font-size: 0.75rem; color: var(--slate-500);">${m.createdBy || 'SYSTEM'}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // Render Low Stock Replenishment Center Table
+        function renderLowStockTable() {
+            const list = products.filter(p => p.isLowStock);
+            const tbody = document.getElementById('lowstock-tbody');
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--success); padding: 2rem;">🎉 Excellent! All inventory items are comfortably above reorder thresholds.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = list.map(p => {
+                const deficit = Math.max(0, p.reorderLevel - p.quantityInStock);
+                return `
                     <tr>
-                        <td><code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">${m.referenceCode}</code></td>
-                        <td>${new Date(m.movementDate).toLocaleString()}</td>
+                        <td><code class="sku-pill">${p.sku}</code></td>
+                        <td><strong>${p.productName}</strong></td>
+                        <td>${p.warehouseName || 'Warehouse'}</td>
+                        <td><strong style="color: var(--danger); font-size: 1.05rem;">${p.quantityInStock}</strong></td>
+                        <td>${p.reorderLevel} units</td>
+                        <td><span class="badge badge-danger">-${deficit} units below</span></td>
                         <td>
-                            <span class="badge ${m.movementType === 'STOCK_IN' ? 'badge-success' : 'badge-warning'}">
-                                ${m.movementType}
-                            </span>
+                            <button class="btn btn-primary btn-sm" onclick="quickStockIn('${p.id}', ${deficit + 10})">
+                                ➕ Restock (+${deficit + 10})
+                            </button>
                         </td>
-                        <td><strong>${m.quantity}</strong></td>
-                        <td>${m.previousStock} &rarr; <strong>${m.resultingStock}</strong></td>
-                        <td>${m.notes || '—'}</td>
                     </tr>
-                `).join('');
-            } catch (err) {
-                console.error(err);
+                `;
+            }).join('');
+        }
+
+        function toggleLowStockFilter(btn) {
+            showOnlyLowStock = !showOnlyLowStock;
+            btn.className = showOnlyLowStock ? 'btn btn-primary' : 'btn btn-outline';
+            btn.textContent = showOnlyLowStock ? 'Showing Low Stock (Active)' : '⚠️ Show Low Stock Only';
+            renderProductsTable();
+        }
+
+        function handleGlobalSearch(query) {
+            const q = query.trim().toLowerCase();
+            if (!q) {
+                renderProductsTable();
+                return;
             }
+            const filtered = products.filter(p => 
+                p.sku.toLowerCase().includes(q) || 
+                p.productName.toLowerCase().includes(q) ||
+                (p.warehouseName && p.warehouseName.toLowerCase().includes(q))
+            );
+            renderProductsTable(filtered);
         }
 
-        function updateDashboardMetrics() {
-            document.getElementById('stat-warehouses').textContent = cachedWarehouses.length;
-            document.getElementById('stat-products').textContent = cachedProducts.length;
-            const totalUnits = cachedProducts.reduce((sum, p) => sum + (p.quantityInStock || 0), 0);
-            document.getElementById('stat-units').textContent = totalUnits.toLocaleString();
-            const lowStockCount = cachedProducts.filter(p => p.isLowStock).length;
-            document.getElementById('stat-low-stock').textContent = lowStockCount;
-        }
-
-        function populateSelects() {
+        function populateDropdowns() {
             const whSelect = document.getElementById('prod-warehouse');
             if (whSelect) {
-                whSelect.innerHTML = '<option value="">Select Warehouse...</option>' +
-                    cachedWarehouses.map(w => `<option value="${w.id}">${w.warehouseName} (${w.warehouseCode})</option>`).join('');
+                whSelect.innerHTML = '<option value="">Select storage warehouse...</option>' +
+                    warehouses.map(w => `<option value="${w.id}">${w.warehouseName} (${w.warehouseCode}) - Cap: ${w.capacity}</option>`).join('');
             }
 
-            const prodSelect = document.getElementById('mov-product');
-            if (prodSelect) {
-                prodSelect.innerHTML = '<option value="">Select Product...</option>' +
-                    cachedProducts.map(p => `<option value="${p.id}">${p.productName} (SKU: ${p.sku} | Stock: ${p.quantityInStock})</option>`).join('');
+            const movProdSelect = document.getElementById('mov-product');
+            if (movProdSelect) {
+                movProdSelect.innerHTML = '<option value="">Choose product SKU...</option>' +
+                    products.map(p => `<option value="${p.id}">${p.productName} [${p.sku}] (Current Stock: ${p.quantityInStock})</option>`).join('');
             }
         }
 
+        function generateRefCode() {
+            const dateStr = new Date().toISOString().slice(0,10).replace(/-/g, '');
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('mov-ref').value = `REF-${dateStr}-${rand}`;
+        }
+
+        // Live calculation & Deficit Protection Guard in UI
+        function calculateStockDelta() {
+            const prodId = document.getElementById('mov-product').value;
+            const type = document.getElementById('mov-type').value;
+            const qty = parseInt(document.getElementById('mov-qty').value) || 0;
+            const submitBtn = document.getElementById('btn-submit-movement');
+            const alertBox = document.getElementById('deficit-alert');
+
+            if (!prodId) {
+                document.getElementById('preview-current-stock').textContent = '0 units';
+                document.getElementById('preview-resulting-stock').textContent = '0 units';
+                return;
+            }
+
+            const product = products.find(p => p.id === prodId);
+            if (!product) return;
+
+            const curr = product.quantityInStock || 0;
+            document.getElementById('preview-current-stock').textContent = `${curr} units`;
+
+            let resulting = curr;
+            if (type === 'STOCK_IN') {
+                resulting = curr + qty;
+            } else if (type === 'STOCK_OUT') {
+                resulting = curr - qty;
+            } else if (type === 'ADJUSTMENT') {
+                resulting = qty;
+            }
+
+            const resultingElem = document.getElementById('preview-resulting-stock');
+            resultingElem.textContent = `${resulting} units`;
+
+            // Deficit guard check
+            if (type === 'STOCK_OUT' && qty > curr) {
+                alertBox.style.display = 'block';
+                resultingElem.style.color = 'var(--danger)';
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.5';
+                submitBtn.style.cursor = 'not-allowed';
+            } else {
+                alertBox.style.display = 'none';
+                resultingElem.style.color = 'var(--success)';
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+            }
+        }
+
+        function quickStockMovement(prodId) {
+            openModal('modal-movement');
+            document.getElementById('mov-product').value = prodId;
+            calculateStockDelta();
+        }
+
+        function quickStockIn(prodId, suggestedQty) {
+            openModal('modal-movement');
+            document.getElementById('mov-product').value = prodId;
+            document.getElementById('mov-type').value = 'STOCK_IN';
+            document.getElementById('mov-qty').value = suggestedQty;
+            calculateStockDelta();
+        }
+
+        // Submissions
         async function submitWarehouse(e) {
             e.preventDefault();
             const payload = {
-                warehouseCode: document.getElementById('wh-code').value.trim(),
+                warehouseCode: document.getElementById('wh-code').value.trim().toUpperCase(),
                 warehouseName: document.getElementById('wh-name').value.trim(),
                 location: document.getElementById('wh-location').value.trim(),
                 capacity: parseInt(document.getElementById('wh-capacity').value),
@@ -810,27 +1555,27 @@
             try {
                 const res = await fetch('/api/v1/warehouses', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-User-Id': 'PORTAL-USER' },
+                    headers: { 'Content-Type': 'application/json', 'X-User-Id': 'iradukunda@auca.ac.rw' },
                     body: JSON.stringify(payload)
                 });
-                const data = await res.json();
+                const json = await res.json();
                 if (res.ok) {
-                    showToast('Warehouse registered successfully!');
+                    showToast('Warehouse facility created successfully!', 'success');
                     closeModal('modal-warehouse');
                     document.getElementById('form-warehouse').reset();
                     loadAllData();
                 } else {
-                    showToast(data.message || 'Failed to create warehouse', true);
+                    showToast(json.message || 'Failed to create warehouse', 'error');
                 }
             } catch (err) {
-                showToast('Network error connecting to API', true);
+                showToast('Network error connecting to API', 'error');
             }
         }
 
         async function submitProduct(e) {
             e.preventDefault();
             const payload = {
-                sku: document.getElementById('prod-sku').value.trim(),
+                sku: document.getElementById('prod-sku').value.trim().toUpperCase(),
                 productName: document.getElementById('prod-name').value.trim(),
                 warehouseId: document.getElementById('prod-warehouse').value,
                 price: parseFloat(document.getElementById('prod-price').value),
@@ -841,20 +1586,20 @@
             try {
                 const res = await fetch('/api/v1/products', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-User-Id': 'PORTAL-USER' },
+                    headers: { 'Content-Type': 'application/json', 'X-User-Id': 'iradukunda@auca.ac.rw' },
                     body: JSON.stringify(payload)
                 });
-                const data = await res.json();
+                const json = await res.json();
                 if (res.ok) {
-                    showToast('Product registered successfully!');
+                    showToast('Product cataloged successfully!', 'success');
                     closeModal('modal-product');
                     document.getElementById('form-product').reset();
                     loadAllData();
                 } else {
-                    showToast(data.message || 'Failed to create product', true);
+                    showToast(json.message || 'Failed to catalog product', 'error');
                 }
             } catch (err) {
-                showToast('Network error connecting to API', true);
+                showToast('Network error connecting to API', 'error');
             }
         }
 
@@ -863,7 +1608,7 @@
             const payload = {
                 productId: document.getElementById('mov-product').value,
                 movementType: document.getElementById('mov-type').value,
-                quantity: parseInt(document.getElementById('mov-quantity').value),
+                quantity: parseInt(document.getElementById('mov-qty').value),
                 referenceCode: document.getElementById('mov-ref').value.trim(),
                 notes: document.getElementById('mov-notes').value.trim()
             };
@@ -871,24 +1616,46 @@
             try {
                 const res = await fetch('/api/v1/stock-movements', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-User-Id': 'PORTAL-USER' },
+                    headers: { 'Content-Type': 'application/json', 'X-User-Id': 'iradukunda@auca.ac.rw' },
                     body: JSON.stringify(payload)
                 });
-                const data = await res.json();
-                if (res.ok) {
-                    showToast('Stock movement processed successfully!');
+                const json = await res.json();
+                if (res.status === 409) {
+                    showToast('Concurrency Conflict: Another user modified this item concurrently. Data refreshed!', 'conflict');
+                    loadAllData();
+                } else if (res.ok) {
+                    showToast(`Stock movement recorded (${payload.movementType})`, 'success');
                     closeModal('modal-movement');
                     document.getElementById('form-movement').reset();
                     loadAllData();
                 } else {
-                    showToast(data.message || 'Failed to process movement', true);
+                    showToast(json.message || 'Transaction rejected by business rules', 'error');
                 }
             } catch (err) {
-                showToast('Network error connecting to API', true);
+                showToast('Network error connecting to API', 'error');
             }
         }
 
-        // Auto load on start
+        async function deleteProduct(id, name) {
+            if (!confirm(`Are you sure you want to delete product "${name}"?`)) return;
+            try {
+                const res = await fetch(`/api/v1/products/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'X-User-Id': 'iradukunda@auca.ac.rw' }
+                });
+                if (res.ok) {
+                    showToast(`Product "${name}" deleted`, 'success');
+                    loadAllData();
+                } else {
+                    const json = await res.json();
+                    showToast(json.message || 'Cannot delete product', 'error');
+                }
+            } catch (err) {
+                showToast('Network error deleting product', 'error');
+            }
+        }
+
+        // Initialize on page load
         window.addEventListener('DOMContentLoaded', loadAllData);
     </script>
 </body>
